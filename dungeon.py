@@ -109,6 +109,7 @@ class Dungeon:
         self.directionDict = {"up":"down","down":"up","right":"left","left":"right"}
         self.direction = ["up","down","left","right"]
         self.lastDirection = ""
+        self.lastSize = (0,0)
         self.posx = -300
         self.posy = -300
 
@@ -117,28 +118,47 @@ class Dungeon:
 
     def createDungeon(self,rooms):
         direction = random.choice(self.direction)
+        direction = "left"
         startRoom = Level(self.posx,self.posy,10,10,"start",[direction])
         self.lastDirection = direction
+        self.lastSize = (startRoom.width - 6,startRoom.height - 6)
         self.dungeon.append(startRoom)
 
         for i in range(rooms - 1):
             pathDirections = []
-            pathDirections.append(self.directionDict[self.lastDirection])         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            while len(pathDirections) <= 1:
-                nextPath = random.choice(self.direction)
-                if nextPath not in pathDirections:
-                    pathDirections.append(nextPath)
+            pathDirections.append(self.directionDict[self.lastDirection])
+            if i < rooms - 2:
+                while len(pathDirections) <= 1:
+                    nextPath = random.choice(self.direction)
+                    if nextPath not in pathDirections:
+                        pathDirections.append(nextPath)
 
-            roomWidth = random.randint(10,10)
-            roomHeight = random.randint(10,10)
-            if nextPath == "right":
-                self.posx += roomWidth * TILESIZE + 600
-            elif nextPath == "left":
+                roomWidth = random.randint(10,20)
+                roomHeight = random.randint(10,20)
+
+                if roomWidth % 2 != 0:
+                    roomWidth += 1
+                if roomHeight % 2 != 0:
+                    roomHeight += 1
+            else:
+                roomWidth = 20
+                roomHeight = 20
+
+            if pathDirections[0] == "right":
                 self.posx -= roomWidth * TILESIZE + 600
-            elif nextPath == "up":
+                self.posy += ((self.lastSize[1] // 2) - (roomHeight // 2)) * TILESIZE
+            elif pathDirections[0] == "left":
+                self.posx += self.lastSize[0] * TILESIZE + 600
+                self.posy += ((self.lastSize[1] // 2) - (roomHeight // 2)) * TILESIZE
+            elif pathDirections[0] == "up":
+                self.posy += self.lastSize[1] * TILESIZE + 600
+                self.posx += ((self.lastSize[0] // 2) - (roomWidth // 2)) * TILESIZE
+            elif pathDirections[0] == "down":
                 self.posy -= roomHeight * TILESIZE + 600
-            elif nextPath == "down":
-                self.posy += roomHeight * TILESIZE + 600
+                self.posx += ((self.lastSize[0] // 2) - (roomWidth // 2)) * TILESIZE
+
+
+            self.lastSize = (roomWidth,roomHeight)
 
             self.dungeon.append(Level(self.posx,self.posy,roomWidth,roomHeight,"",pathDirections))
             self.lastDirection = nextPath
@@ -147,4 +167,4 @@ class Dungeon:
 
 
 dungeonLevel = Dungeon()
-dungeon = dungeonLevel.createDungeon(10)
+dungeon = dungeonLevel.createDungeon(5)

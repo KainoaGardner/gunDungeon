@@ -3,7 +3,7 @@ from player import *
 from dungeon import *
 
 def display():
-    screen.fill("#bdc3c7")
+    screen.fill("#3d3d3d")
 
     for room in dungeon:
         for tile in room.tileGroup:

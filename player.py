@@ -44,7 +44,7 @@ class Player(pygame.sprite.Sprite):
         if (keys[pygame.K_w] and keys[pygame.K_a]) or (keys[pygame.K_w] and keys[pygame.K_d]) or (keys[pygame.K_s] and keys[pygame.K_a]) or (keys[pygame.K_s] and keys[pygame.K_d]):
             self.diagonal = True
         else:
-            self.diagnal = False
+            self.diagonal = False
 
         if self.diagonal:
             speed = self.diagonalSpeed
