@@ -112,21 +112,28 @@ class Dungeon:
         self.lastSize = (0,0)
         self.posx = -300
         self.posy = -300
+        self.empty = False
+        self.placedRoomPoints = []
 
         self.dungeon = []
 
 
     def createDungeon(self,rooms):
+        self.empty = False
         direction = random.choice(self.direction)
-        direction = "left"
         startRoom = Level(self.posx,self.posy,10,10,"start",[direction])
         self.lastDirection = direction
         self.lastSize = (startRoom.width - 6,startRoom.height - 6)
+        self.placedRoomPoints.append((self.posx,self.posy))
+        self.placedRoomPoints.append((self.posx + 10 * TILESIZE,self.posy * TILESIZE))
+
         self.dungeon.append(startRoom)
 
         for i in range(rooms - 1):
+            # while not self.empty:
             pathDirections = []
             pathDirections.append(self.directionDict[self.lastDirection])
+
             if i < rooms - 2:
                 while len(pathDirections) <= 1:
                     nextPath = random.choice(self.direction)
@@ -143,6 +150,8 @@ class Dungeon:
             else:
                 roomWidth = 20
                 roomHeight = 20
+
+            # self.empty = self.checkPlaced(roomWidth,roomHeight,pathDirections[0])
 
             if pathDirections[0] == "right":
                 self.posx -= roomWidth * TILESIZE + 600
@@ -164,6 +173,33 @@ class Dungeon:
             self.lastDirection = nextPath
 
         return self.dungeon
+
+    def checkPlaced(self,width,height,direction):
+        posx = self.posx
+        posy = self.posy
+        if direction == "right":
+            posx -= width * TILESIZE + 600
+            posy += ((self.lastSize[1] // 2) - (height // 2)) * TILESIZE
+        elif direction == "left":
+            posx += self.lastSize[0] * TILESIZE + 600
+            posy += ((self.lastSize[1] // 2) - (height // 2)) * TILESIZE
+        elif direction == "up":
+            posy += self.lastSize[1] * TILESIZE + 600
+            posx += ((self.lastSize[0] // 2) - (width // 2)) * TILESIZE
+        elif direction == "down":
+            posy -= height * TILESIZE + 600
+            posx += ((self.lastSize[0] // 2) - (width // 2)) * TILESIZE
+
+        point1 = (posx,posy)
+        point2 = (posx + width * TILESIZE,posy + height * TILESIZE)
+
+        for point in self.placedRoomPoints:
+            if point1[0] < point[0] < point2[0] and point1[1] < point[1] < point2[0]:
+                return False
+
+        self.placedRoomPoints.append(point1)
+        self.placedRoomPoints.append(point2)
+        return True
 
 
 dungeonLevel = Dungeon()
